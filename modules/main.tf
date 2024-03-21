@@ -19,9 +19,9 @@
 #########
 
 locals {
-  source_image         = var.source_image != "" ? var.source_image : "rocky-linux-9-optimized-gcp-v20240111"
-  source_image_family  = var.source_image_family != "" ? var.source_image_family : "rocky-linux-9-optimized-gcp"
-  source_image_project = var.source_image_project != "" ? var.source_image_project : "rocky-linux-cloud"
+  source_image         = var.source_image != "" ? var.source_image : "centos-7-v20201112"
+  source_image_family  = var.source_image_family != "" ? var.source_image_family : "centos-7"
+  source_image_project = var.source_image_project != "" ? var.source_image_project : "centos-cloud"
 
   boot_disk = [
     {
@@ -35,8 +35,6 @@ locals {
   ]
 
   all_disks = concat(local.boot_disk, var.additional_disks)
-
-
 
   # NOTE: Even if all the shielded_instance_config or confidential_instance_config
   # values are false, if the config block exists and an unsupported image is chosen,
@@ -65,7 +63,6 @@ locals {
 # Instance Template
 ####################
 resource "google_compute_instance_template" "tpl" {
-  provider                = google-beta
   name_prefix             = "${var.name_prefix}-"
   project                 = var.project_id
   machine_type            = var.machine_type
@@ -76,23 +73,21 @@ resource "google_compute_instance_template" "tpl" {
   metadata_startup_script = var.startup_script
   region                  = var.region
   min_cpu_platform        = var.min_cpu_platform
-  resource_policies       = var.resource_policies
   dynamic "disk" {
     for_each = local.all_disks
     content {
-      auto_delete     = lookup(disk.value, "auto_delete", null)
-      boot            = lookup(disk.value, "boot", null)
-      device_name     = lookup(disk.value, "device_name", null)
-      disk_name       = lookup(disk.value, "disk_name", null)
-      disk_size_gb    = lookup(disk.value, "disk_size_gb", lookup(disk.value, "disk_type", null) == "local-ssd" ? "375" : null)
-      disk_type       = lookup(disk.value, "disk_type", null)
-      interface       = lookup(disk.value, "interface", lookup(disk.value, "disk_type", null) == "local-ssd" ? "NVME" : null)
-      mode            = lookup(disk.value, "mode", null)
-      source          = lookup(disk.value, "source", null)
-      source_image    = lookup(disk.value, "source_image", null)
-      source_snapshot = lookup(disk.value, "source_snapshot", null)
-      type            = lookup(disk.value, "disk_type", null) == "local-ssd" ? "SCRATCH" : "PERSISTENT"
-      labels          = lookup(disk.value, "disk_labels", null)
+      auto_delete  = lookup(disk.value, "auto_delete", null)
+      boot         = lookup(disk.value, "boot", null)
+      device_name  = lookup(disk.value, "device_name", null)
+      disk_name    = lookup(disk.value, "disk_name", null)
+      disk_size_gb = lookup(disk.value, "disk_size_gb", lookup(disk.value, "disk_type", null) == "local-ssd" ? "375" : null)
+      disk_type    = lookup(disk.value, "disk_type", null)
+      interface    = lookup(disk.value, "interface", lookup(disk.value, "disk_type", null) == "local-ssd" ? "NVME" : null)
+      mode         = lookup(disk.value, "mode", null)
+      source       = lookup(disk.value, "source", null)
+      source_image = lookup(disk.value, "source_image", null)
+      type         = lookup(disk.value, "disk_type", null) == "local-ssd" ? "SCRATCH" : "PERSISTENT"
+      labels       = lookup(disk.value, "disk_labels", null)
 
       dynamic "disk_encryption_key" {
         for_each = compact([var.disk_encryption_key == null ? null : 1])
@@ -116,7 +111,6 @@ resource "google_compute_instance_template" "tpl" {
     subnetwork         = var.subnetwork
     subnetwork_project = var.subnetwork_project
     network_ip         = length(var.network_ip) > 0 ? var.network_ip : null
-    nic_type           = var.nic_type
     stack_type         = var.stack_type
     dynamic "access_config" {
       for_each = var.access_config
@@ -147,9 +141,6 @@ resource "google_compute_instance_template" "tpl" {
       subnetwork         = network_interface.value.subnetwork
       subnetwork_project = network_interface.value.subnetwork_project
       network_ip         = length(network_interface.value.network_ip) > 0 ? network_interface.value.network_ip : null
-      nic_type           = network_interface.value.nic_type
-      stack_type         = network_interface.value.stack_type
-      queue_count        = network_interface.value.queue_count
       dynamic "access_config" {
         for_each = network_interface.value.access_config
         content {
@@ -163,13 +154,6 @@ resource "google_compute_instance_template" "tpl" {
           network_tier = ipv6_access_config.value.network_tier
         }
       }
-      dynamic "alias_ip_range" {
-        for_each = network_interface.value.alias_ip_range
-        content {
-          ip_cidr_range         = alias_ip_range.value.ip_cidr_range
-          subnetwork_range_name = alias_ip_range.value.subnetwork_range_name
-        }
-      }
     }
   }
 
@@ -178,12 +162,11 @@ resource "google_compute_instance_template" "tpl" {
   }
 
   scheduling {
-    automatic_restart           = local.automatic_restart
-    instance_termination_action = var.spot ? var.spot_instance_termination_action : null
-    maintenance_interval        = var.maintenance_interval
-    on_host_maintenance         = local.on_host_maintenance
     preemptible                 = local.preemptible
+    automatic_restart           = local.automatic_restart
+    on_host_maintenance         = local.on_host_maintenance
     provisioning_model          = var.spot ? "SPOT" : null
+    instance_termination_action = var.spot ? "STOP" : null
   }
 
   advanced_machine_features {
@@ -202,10 +185,6 @@ resource "google_compute_instance_template" "tpl" {
 
   confidential_instance_config {
     enable_confidential_compute = var.enable_confidential_vm
-  }
-
-  network_performance_config {
-    total_egress_bandwidth_tier = var.total_egress_bandwidth_tier
   }
 
   dynamic "guest_accelerator" {
