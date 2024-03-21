@@ -1,0 +1,40 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: detect-private-key
+      - id: pretty-format-json
+        args:
+          - --autofix
+      # - id: trailing-whitespace
+      - id: check-symlinks
+      # - id: end-of-file-fixer
+      - id: mixed-line-ending
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.16
+    hooks:
+      - id: mdformat
+        additional_dependencies:
+          - mdformat-gfm
+          - mdformat-toc
+        # mdformat fights with terraform_docs
+        exclude: README.m(ark)?d(own)?
+  - repo: https://github.com/google/yamlfmt
+    rev: v0.10.0
+    hooks:
+      - id: yamlfmt
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.27.3
+    hooks:
+      - id: check-jsonschema
+        args: ["--builtin-schema", "vendor.cloudbuild"]
+        types: [yaml]
+        files: ".cloudbuild.yaml"
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.86.0 # Get the latest from: https://github.com/antonbabenko/pre-commit-terraform/releases
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_docs
