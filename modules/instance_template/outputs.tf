@@ -28,3 +28,8 @@ output "tags" {
   description = "Tags that will be associated with instance(s)"
   value       = google_compute_instance_template.tpl.tags
 }
+
+output "all_networks" {
+  description = "All Network Interfaces"
+  value       = local.all_networks
+}
