@@ -36,6 +36,22 @@ locals {
 
   all_disks = concat(local.boot_disk, var.additional_disks)
 
+
+  primary_network = [
+    {
+      network            = var.network
+      subnetwork         = var.subnetwork
+      subnetwork_project = var.subnetwork_project
+      network_ip         = length(var.network_ip) > 0 ? var.network_ip : null
+      stack_type         = var.stack_type
+      access_config      = var.access_config
+      ipv6_access_config = var.ipv6_access_config
+      alias_ip_range     = var.alias_ip_range
+    }
+  ]
+
+  all_networks = concat(local.primary_network, var.additional_networks)
+
   # NOTE: Even if all the shielded_instance_config or confidential_instance_config
   # values are false, if the config block exists and an unsupported image is chosen,
   # the apply will fail so we use a single-value array with the default value to
@@ -106,36 +122,36 @@ resource "google_compute_instance_template" "tpl" {
     }
   }
 
-  network_interface {
-    network            = var.network
-    subnetwork         = var.subnetwork
-    subnetwork_project = var.subnetwork_project
-    network_ip         = length(var.network_ip) > 0 ? var.network_ip : null
-    stack_type         = var.stack_type
-    dynamic "access_config" {
-      for_each = var.access_config
-      content {
-        nat_ip       = access_config.value.nat_ip
-        network_tier = access_config.value.network_tier
-      }
-    }
-    dynamic "ipv6_access_config" {
-      for_each = var.ipv6_access_config
-      content {
-        network_tier = ipv6_access_config.value.network_tier
-      }
-    }
-    dynamic "alias_ip_range" {
-      for_each = local.alias_ip_range_enabled ? [var.alias_ip_range] : []
-      content {
-        ip_cidr_range         = alias_ip_range.value.ip_cidr_range
-        subnetwork_range_name = alias_ip_range.value.subnetwork_range_name
-      }
-    }
-  }
+  # network_interface {
+  #   network            = var.network
+  #   subnetwork         = var.subnetwork
+  #   subnetwork_project = var.subnetwork_project
+  #   network_ip         = length(var.network_ip) > 0 ? var.network_ip : null
+  #   stack_type         = var.stack_type
+  #   dynamic "access_config" {
+  #     for_each = var.access_config
+  #     content {
+  #       nat_ip       = access_config.value.nat_ip
+  #       network_tier = access_config.value.network_tier
+  #     }
+  #   }
+  #   dynamic "ipv6_access_config" {
+  #     for_each = var.ipv6_access_config
+  #     content {
+  #       network_tier = ipv6_access_config.value.network_tier
+  #     }
+  #   }
+  #   dynamic "alias_ip_range" {
+  #     for_each = local.alias_ip_range_enabled ? [var.alias_ip_range] : []
+  #     content {
+  #       ip_cidr_range         = alias_ip_range.value.ip_cidr_range
+  #       subnetwork_range_name = alias_ip_range.value.subnetwork_range_name
+  #     }
+  #   }
+  # }
 
   dynamic "network_interface" {
-    for_each = var.additional_networks
+    for_each = local.all_networks
     content {
       network            = network_interface.value.network
       subnetwork         = network_interface.value.subnetwork
@@ -152,6 +168,14 @@ resource "google_compute_instance_template" "tpl" {
         for_each = network_interface.value.ipv6_access_config
         content {
           network_tier = ipv6_access_config.value.network_tier
+        }
+      }
+
+      dynamic "alias_ip_range" {
+        for_each = local.alias_ip_range_enabled ? [var.alias_ip_range] : []
+        content {
+          ip_cidr_range         = alias_ip_range.value.ip_cidr_range
+          subnetwork_range_name = alias_ip_range.value.subnetwork_range_name
         }
       }
     }
