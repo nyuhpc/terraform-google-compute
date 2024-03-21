@@ -186,11 +186,13 @@ resource "google_compute_instance_template" "tpl" {
   }
 
   scheduling {
-    preemptible                 = local.preemptible
-    automatic_restart           = local.automatic_restart
-    on_host_maintenance         = local.on_host_maintenance
-    provisioning_model          = var.spot ? "SPOT" : null
-    instance_termination_action = var.spot ? "STOP" : null
+    preemptible         = local.preemptible
+    automatic_restart   = local.automatic_restart
+    on_host_maintenance = local.on_host_maintenance
+
+    # Below arguments are not supported by Google provider 3.90.1
+    # provisioning_model          = var.spot ? "SPOT" : null
+    # instance_termination_action = var.spot ? "STOP" : null
   }
 
   advanced_machine_features {
