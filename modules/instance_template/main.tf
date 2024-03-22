@@ -1,19 +1,3 @@
-/**
- * Copyright 2019 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 #########
 # Locals
 #########
@@ -43,10 +27,6 @@ locals {
       subnetwork         = var.subnetwork
       subnetwork_project = var.subnetwork_project
       network_ip         = length(var.network_ip) > 0 ? var.network_ip : null
-      # stack_type         = var.stack_type
-      # access_config      = var.access_config
-      # ipv6_access_config = var.ipv6_access_config
-      # alias_ip_range     = var.alias_ip_range
     }
   ]
 
@@ -121,34 +101,6 @@ resource "google_compute_instance_template" "tpl" {
       scopes = lookup(service_account.value, "scopes", null)
     }
   }
-
-  # network_interface {
-  #   network            = var.network
-  #   subnetwork         = var.subnetwork
-  #   subnetwork_project = var.subnetwork_project
-  #   network_ip         = length(var.network_ip) > 0 ? var.network_ip : null
-  #   stack_type         = var.stack_type
-  #   dynamic "access_config" {
-  #     for_each = var.access_config
-  #     content {
-  #       nat_ip       = access_config.value.nat_ip
-  #       network_tier = access_config.value.network_tier
-  #     }
-  #   }
-  #   dynamic "ipv6_access_config" {
-  #     for_each = var.ipv6_access_config
-  #     content {
-  #       network_tier = ipv6_access_config.value.network_tier
-  #     }
-  #   }
-  #   dynamic "alias_ip_range" {
-  #     for_each = local.alias_ip_range_enabled ? [var.alias_ip_range] : []
-  #     content {
-  #       ip_cidr_range         = alias_ip_range.value.ip_cidr_range
-  #       subnetwork_range_name = alias_ip_range.value.subnetwork_range_name
-  #     }
-  #   }
-  # }
 
   dynamic "network_interface" {
     for_each = local.network_interfaces
