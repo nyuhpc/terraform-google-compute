@@ -66,28 +66,29 @@ resource "google_compute_instance_from_template" "compute_instance" {
       subnetwork         = network_interface.value.subnetwork
       subnetwork_project = network_interface.value.subnetwork_project
       network_ip         = network_interface.value.network_ip
-      dynamic "access_config" {
-        for_each = network_interface.value.access_config
-        content {
-          nat_ip       = access_config.value.nat_ip
-          network_tier = access_config.value.network_tier
-        }
-      }
+      # Ignore these dynamic blocks until we upgrade TF and can use optional attributes
+      #   dynamic "access_config" {
+      #     for_each = network_interface.value.access_config
+      #     content {
+      #       nat_ip       = access_config.value.nat_ip
+      #       network_tier = access_config.value.network_tier
+      #     }
+      #   }
 
-      dynamic "ipv6_access_config" {
-        for_each = network_interface.value.ipv6_access_config
-        content {
-          network_tier = ipv6_access_config.value.network_tier
-        }
-      }
+      #   dynamic "ipv6_access_config" {
+      #     for_each = network_interface.value.ipv6_access_config
+      #     content {
+      #       network_tier = ipv6_access_config.value.network_tier
+      #     }
+      #   }
 
-      dynamic "alias_ip_range" {
-        for_each = network_interface.value.alias_ip_range
-        content {
-          ip_cidr_range         = alias_ip_range.value.ip_cidr_range
-          subnetwork_range_name = alias_ip_range.value.subnetwork_range_name
-        }
-      }
+      #   dynamic "alias_ip_range" {
+      #     for_each = network_interface.value.alias_ip_range
+      #     content {
+      #       ip_cidr_range         = alias_ip_range.value.ip_cidr_range
+      #       subnetwork_range_name = alias_ip_range.value.subnetwork_range_name
+      #     }
+      #   }
     }
   }
 

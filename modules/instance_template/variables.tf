@@ -204,13 +204,18 @@ variable "additional_networks" {
     subnetwork         = string
     subnetwork_project = string
     network_ip         = string
-    access_config = list(object({
-      nat_ip       = string
-      network_tier = string
-    }))
-    ipv6_access_config = list(object({
-      network_tier = string
-    }))
+    # Ignore next 3 objects until we upgrade TF and can use optional attributes
+    # access_config = list(object({
+    #   nat_ip       = string
+    #   network_tier = string
+    # }))
+    # ipv6_access_config = list(object({
+    #   network_tier = string
+    # }))
+    # alias_ip_range = list(object({
+    #   ip_cidr_range         = string
+    #   subnetwork_range_name = string
+    # }))
   }))
 }
 
