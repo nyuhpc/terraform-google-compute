@@ -190,11 +190,11 @@ variable "network_ip" {
   default     = ""
 }
 
-variable "stack_type" {
-  description = "The stack type for this network interface to identify whether the IPv6 feature is enabled or not. Values are `IPV4_IPV6` or `IPV4_ONLY`. Default behavior is equivalent to IPV4_ONLY."
-  type        = string
-  default     = null
-}
+# variable "stack_type" {
+#   description = "The stack type for this network interface to identify whether the IPv6 feature is enabled or not. Values are `IPV4_IPV6` or `IPV4_ONLY`. Default behavior is equivalent to IPV4_ONLY."
+#   type        = string
+#   default     = null
+# }
 
 variable "additional_networks" {
   description = "Additional network interface details for GCE, if any."
@@ -283,22 +283,22 @@ variable "enable_confidential_vm" {
 ###########################
 # Public IP
 ###########################
-variable "access_config" {
-  description = "Access configurations, i.e. IPs via which the VM instance can be accessed via the Internet."
-  type = list(object({
-    nat_ip       = string
-    network_tier = string
-  }))
-  default = []
-}
+# variable "access_config" {
+#   description = "Access configurations, i.e. IPs via which the VM instance can be accessed via the Internet."
+#   type = list(object({
+#     nat_ip       = string
+#     network_tier = string
+#   }))
+#   default = []
+# }
 
-variable "ipv6_access_config" {
-  description = "IPv6 access configurations. Currently a max of 1 IPv6 access configuration is supported. If not specified, the instance will have no external IPv6 Internet access."
-  type = list(object({
-    network_tier = string
-  }))
-  default = []
-}
+# variable "ipv6_access_config" {
+#   description = "IPv6 access configurations. Currently a max of 1 IPv6 access configuration is supported. If not specified, the instance will have no external IPv6 Internet access."
+#   type = list(object({
+#     network_tier = string
+#   }))
+#   default = []
+# }
 
 ###########################
 # Guest Accelerator (GPU)
@@ -315,15 +315,15 @@ variable "gpu" {
 ##################
 # alias IP range
 ##################
-variable "alias_ip_range" {
-  description = <<EOF
-An array of alias IP ranges for this network interface. Can only be specified for network interfaces on subnet-mode networks.
-ip_cidr_range: The IP CIDR range represented by this alias IP range. This IP CIDR range must belong to the specified subnetwork and cannot contain IP addresses reserved by system or used by other network interfaces. At the time of writing only a netmask (e.g. /24) may be supplied, with a CIDR format resulting in an API error.
-subnetwork_range_name: The subnetwork secondary range name specifying the secondary range from which to allocate the IP CIDR range for this alias IP range. If left unspecified, the primary range of the subnetwork will be used.
-EOF
-  type = object({
-    ip_cidr_range         = string
-    subnetwork_range_name = string
-  })
-  default = null
-}
+# variable "alias_ip_range" {
+#   description = <<EOF
+# An array of alias IP ranges for this network interface. Can only be specified for network interfaces on subnet-mode networks.
+# ip_cidr_range: The IP CIDR range represented by this alias IP range. This IP CIDR range must belong to the specified subnetwork and cannot contain IP addresses reserved by system or used by other network interfaces. At the time of writing only a netmask (e.g. /24) may be supplied, with a CIDR format resulting in an API error.
+# subnetwork_range_name: The subnetwork secondary range name specifying the secondary range from which to allocate the IP CIDR range for this alias IP range. If left unspecified, the primary range of the subnetwork will be used.
+# EOF
+#   type = object({
+#     ip_cidr_range         = string
+#     subnetwork_range_name = string
+#   })
+#   default = null
+# }

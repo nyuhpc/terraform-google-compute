@@ -27,6 +27,11 @@ locals {
       subnetwork         = var.subnetwork
       subnetwork_project = var.subnetwork_project
       network_ip         = length(var.network_ip) > 0 ? var.network_ip : null
+      # NOTE: These advanced network interface attributes will be disabled until we upgrade TF and have access to optional attributes
+      # stack_type         = var.stack_type
+      # access_config      = var.access_config
+      # ipv6_access_config = var.ipv6_access_config
+      # alias_ip_range     = var.alias_ip_range
     }
   ]
 
