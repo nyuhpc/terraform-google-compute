@@ -196,7 +196,7 @@ variable "stack_type" {
   default     = null
 }
 
-variable "network_interfaces" {
+variable "additional_networks" {
   description = "Additional network interface details for GCE, if any."
   default     = []
   type = list(object({
