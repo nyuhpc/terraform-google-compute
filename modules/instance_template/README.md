@@ -96,9 +96,9 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_all_networks"></a> [all\_networks](#output\_all\_networks) | All Network Interfaces |
 | <a name="output_id"></a> [id](#output\_id) | Unique ID of instance template |
 | <a name="output_name"></a> [name](#output\_name) | Name of instance template |
+| <a name="output_network_interfaces"></a> [network\_interfaces](#output\_network\_interfaces) | All Network Interfaces |
 | <a name="output_self_link"></a> [self\_link](#output\_self\_link) | Self-link of instance template |
 | <a name="output_tags"></a> [tags](#output\_tags) | Tags that will be associated with instance(s) |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

@@ -34,7 +34,7 @@ output "tags" {
   value       = google_compute_instance_template.tpl.tags
 }
 
-output "all_networks" {
+output "network_interfaces" {
   description = "All Network Interfaces"
   value       = local.network_interfaces
 }
