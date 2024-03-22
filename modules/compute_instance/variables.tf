@@ -82,6 +82,7 @@ variable "network_interfaces" {
     ipv6_access_config = list(object({
       network_tier = string
     }))
+    # Ignore alias_ip_range until we upgrade TF and can use optional attributes
     alias_ip_range = list(object({
       ip_cidr_range         = string
       subnetwork_range_name = string
