@@ -50,7 +50,7 @@ locals {
     }
   ]
 
-  all_networks = concat(local.primary_network, var.additional_networks)
+  network_interface = concat(local.primary_network, var.additional_networks)
 
   # NOTE: Even if all the shielded_instance_config or confidential_instance_config
   # values are false, if the config block exists and an unsupported image is chosen,
@@ -151,7 +151,7 @@ resource "google_compute_instance_template" "tpl" {
   # }
 
   dynamic "network_interface" {
-    for_each = local.all_networks
+    for_each = local.network_interface
     content {
       network            = network_interface.value.network
       subnetwork         = network_interface.value.subnetwork
