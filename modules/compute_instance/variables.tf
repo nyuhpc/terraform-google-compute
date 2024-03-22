@@ -82,6 +82,10 @@ variable "network_interfaces" {
     ipv6_access_config = list(object({
       network_tier = string
     }))
+    alias_ip_range = list(object({
+      ip_cidr_range         = string
+      subnetwork_range_name = string
+    }))
   }))
 }
 
