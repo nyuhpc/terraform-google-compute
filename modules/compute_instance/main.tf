@@ -59,7 +59,7 @@ resource "google_compute_instance_from_template" "compute_instance" {
 
   dynamic "network_interface" {
     # for_each = local.network_interface
-    for_each = data.google_compute_instance_template.tpl.network_interface
+    for_each = var.network_interfaces
 
     content {
       network            = network_interface.value.network

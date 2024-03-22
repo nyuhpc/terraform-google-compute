@@ -36,5 +36,5 @@ output "tags" {
 
 output "all_networks" {
   description = "All Network Interfaces"
-  value       = local.network_interface
+  value       = local.network_interfaces
 }
