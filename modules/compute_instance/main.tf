@@ -16,17 +16,17 @@
 
 locals {
   hostname      = var.hostname == "" ? "default" : var.hostname
-  num_instances = length(var.static_ips) == 0 ? var.num_instances : length(var.static_ips)
+  num_instances = 1
 
   # local.static_ips is the same as var.static_ips with a dummy element appended
   # at the end of the list to work around "list does not have any elements so cannot
   # determine type" error when var.static_ips is empty
-  static_ips = concat(var.static_ips, ["NOT_AN_IP"])
+  #   static_ips = concat(var.static_ips, ["NOT_AN_IP"])
   project_id = length(regexall("/projects/([^/]*)", var.instance_template)) > 0 ? flatten(regexall("/projects/([^/]*)", var.instance_template))[0] : null
 
   # When no network or subnetwork has been defined, we want to use the settings from
   # the template instead.
-  network_interface = length(format("%s%s", var.network, var.subnetwork)) == 0 ? [] : [1]
+  network_interface = data.google_compute_instance_template.tpl.network_interface
 }
 
 ###############
@@ -36,6 +36,11 @@ locals {
 data "google_compute_zones" "available" {
   project = local.project_id
   region  = var.region
+}
+
+data "google_compute_instance_template" "tpl" {
+  name    = var.instance_template
+  project = local.project_id
 }
 
 #############
@@ -56,12 +61,12 @@ resource "google_compute_instance_from_template" "compute_instance" {
     for_each = local.network_interface
 
     content {
-      network            = var.network
-      subnetwork         = var.subnetwork
-      subnetwork_project = var.subnetwork_project
-      network_ip         = length(var.static_ips) == 0 ? "" : element(local.static_ips, count.index)
+      network            = network_interface.value.network
+      subnetwork         = network_interface.value.subnetwork
+      subnetwork_project = network_interface.value.subnetwork_project
+      network_ip         = network_interface.value.network_ip
       dynamic "access_config" {
-        for_each = var.access_config
+        for_each = network_interface.value.access_config
         content {
           nat_ip       = access_config.value.nat_ip
           network_tier = access_config.value.network_tier
@@ -69,14 +74,14 @@ resource "google_compute_instance_from_template" "compute_instance" {
       }
 
       dynamic "ipv6_access_config" {
-        for_each = var.ipv6_access_config
+        for_each = network_interface.value.ipv6_access_config
         content {
           network_tier = ipv6_access_config.value.network_tier
         }
       }
 
       dynamic "alias_ip_range" {
-        for_each = var.alias_ip_ranges
+        for_each = network_interface.value.alias_ip_ranges
         content {
           ip_cidr_range         = alias_ip_range.value.ip_cidr_range
           subnetwork_range_name = alias_ip_range.value.subnetwork_range_name
