@@ -26,7 +26,7 @@ locals {
 
   # When no network or subnetwork has been defined, we want to use the settings from
   # the template instead.
-  network_interface = data.google_compute_instance_template.tpl.network_interface
+  #   network_interface = data.google_compute_instance_template.tpl.network_interface
 }
 
 ###############
@@ -58,7 +58,8 @@ resource "google_compute_instance_from_template" "compute_instance" {
   labels              = var.labels
 
   dynamic "network_interface" {
-    for_each = local.network_interface
+    # for_each = local.network_interface
+    for_each = data.google_compute_instance_template.tpl.network_interface
 
     content {
       network            = network_interface.value.network
@@ -91,4 +92,8 @@ resource "google_compute_instance_from_template" "compute_instance" {
   }
 
   source_instance_template = var.instance_template
+
+  depends_on = [
+    data.google_compute_instance_template.tpl
+  ]
 }
