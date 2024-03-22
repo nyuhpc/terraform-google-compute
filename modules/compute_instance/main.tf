@@ -1,32 +1,11 @@
-/**
- * Copyright 2018 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 locals {
   hostname      = var.hostname == "" ? "default" : var.hostname
   num_instances = 1
 
-  # local.static_ips is the same as var.static_ips with a dummy element appended
-  # at the end of the list to work around "list does not have any elements so cannot
-  # determine type" error when var.static_ips is empty
-  #   static_ips = concat(var.static_ips, ["NOT_AN_IP"])
   project_id = length(regexall("/projects/([^/]*)", var.instance_template)) > 0 ? flatten(regexall("/projects/([^/]*)", var.instance_template))[0] : null
 
-  # When no network or subnetwork has been defined, we want to use the settings from
-  # the template instead.
-  #   network_interface = data.google_compute_instance_template.tpl.network_interface
+  # Read the network interface info from the variables and override the template
+  network_interfaces = var.network_interfaces
 }
 
 ###############
@@ -58,8 +37,7 @@ resource "google_compute_instance_from_template" "compute_instance" {
   labels              = var.labels
 
   dynamic "network_interface" {
-    # for_each = local.network_interface
-    for_each = var.network_interfaces
+    for_each = local.network_interfaces
 
     content {
       network            = network_interface.value.network
